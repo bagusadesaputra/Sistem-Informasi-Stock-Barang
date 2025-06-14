@@ -76,12 +76,13 @@ require 'cek.php'
                                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                         <thead>
                                             <tr>
-                                                <th>Tanggal & Waktu</th>
+                                                <th>No</th>
                                                 <th>Barcode</th>
                                                 <th>Nama Barang</th>
                                                 <th>Satuan</th>
                                                 <th>Jumlah Masuk</th>
                                                 <th>Petugas
+                                                <th>Tanggal & Waktu</th>
                                                 </th>
                                             </tr>
                                         </thead>
@@ -90,21 +91,22 @@ require 'cek.php'
                                             $ambilsemuadatastock = mysqli_query($conn, "select * from masuk");
                                             $i = 1;
                                             while ($data=mysqli_fetch_array($ambilsemuadatastock)){
-                                                $tgl = $data['tgl'];
                                                 $barcode = $data['barcode'];
                                                 $namabarang = $data['namabarang'];
                                                 $satuan = $data['satuan'];
                                                 $qty = $data['qty'];
-                                                $keterangan = $data['keterangan'];
+                                                $petugas = $data['petugas'];
+                                                $tgl = $data['tgl'];
                                             ?>
 
                                             <tr>
-                                                <td><?=$tgl;?></td>
+                                                <td><?=$i++;?></td>
                                                 <td><?=$barcode;?></td>
                                                 <td><?=$namabarang;?></td>
                                                 <td><?=$satuan;?></td>
                                                 <td><?=$qty;?></td>
-                                                <td><?=$keterangan;?></td>
+                                                <td><?=$petugas;?></td>
+                                                <td><?=$tgl;?></td>
                                             </tr>
                                             <?php
 
@@ -128,10 +130,14 @@ require 'cek.php'
                     </div>
                 </footer>
             </div>
-        </div>
+
         <!-- End of Page Content -->
 
-        <!-- Scripts -->
+        </div>
+
+    <!-- Scripts -->
+    
+        <!-- JavaScript: CDN, Pkg, Script -->
         <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/quagga/0.12.1/quagga.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@4.5.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
@@ -142,6 +148,42 @@ require 'cek.php'
         <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
         <script src="assets/demo/datatables-demo.js"></script>
         <script src="js/scripts.js"></script>
+
+        <!-- Functions -->
+        
+            <!-- AJAX - Autofill text dari barcode -->
+            <script>
+                $(document).ready(function () {
+                    $('#barcode').on('keyup', function () {
+                        var barcode = $(this).val();
+                        if (barcode.length > 0) {
+                        $.ajax({
+                            url: 'get_barang.php',
+                            method: 'POST',
+                            data: { barcode: barcode },
+                            dataType: 'json',
+                            success: function (data) {
+                            if (data && data.namabarang) {
+                                $('#namabarang').val(data.namabarang);
+                                $('#satuan').val(data.satuan);
+                            } else {
+                                $('#namabarang').val('');
+                                $('#satuan').val('');
+                            }
+                            },
+                            error: function (xhr, status, error) {
+                            console.error('AJAX Error:', error);
+                            }
+                        });
+                        } else {
+                        $('#namabarang').val('');
+                        $('#satuan').val('');
+                        }
+                    });
+                });
+            </script>
+
+    <!-- End of Script -->
 
     </body>
 
@@ -160,23 +202,31 @@ require 'cek.php'
                 <form method="post">
                 <div class="modal-body">
                     <p>Barcode</p>
-                    <div style="display: flex;">
-                        <input type="text" name="barcode" id="barcode" class="form-control" required style="flex:1; margin-right:5px;">
-                        <button type="button" class="btn btn-primary" onclick="startScanner()">Scan</button>
+                    <div class="input-group mb-3">
+                        <input type="text" id="barcode" name="barcode" class="form-control" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-success" type="button" id="btnBarcode">
+                                <i class="fas fa-camera"></i>  Scan
+                            </button>
+                        </div>
                     </div>
-                    <br>
+
                     <p>Nama Barang</p>
-                    <input type="text" name="namabarang" class="form-control" required>
+                    <input type="text" id="namabarang" name="namabarang" class="form-control" readonly>
+                    <br>
+                    <p>Satuan</p>
+                    <input type="text" id="satuan" name="satuan" class="form-control" readonly>
                     <br>
                     <p>Quantity</p>
                     <input type="number" name="qty" placeholder="0" class="form-control" required>
                     <br>
-                    <p>Penerima</p>
-                    <input type="text" name="penerima" class="form-control" required>
+                    <p>Petugas</p>
+                    <input type="text" name="petugas" class="form-control" required>
                     <br>
-                    <button type="submit" class="btn btn-primary" name="barangmasuk">Submit</button>
+                    <button type="submit" class="btn btn-primary" name="tambahbarangmasuk">Submit</button>
                 </div>
-                </form>
+            </form>
+
             </div>
         </div>
     </div>

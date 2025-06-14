@@ -20,30 +20,48 @@ if(isset($_POST['addnewbarang'])){
     if($addtotable) {
         header('location:index.php');
     } else {
-        echo 'Input Gagal';
+        //echo 'Input Gagal';
         header('location:index.php');
     }
 }
 
 //menambah barang masuk
-if(isset($_POST['barangmasuk'])){
-    $barcodenya = $_POST['barcode'];
+if (isset($_POST['tambahbarangmasuk'])) {
+    $barcode = $_POST['barcode'];
+    $qty = intval($_POST['qty']);
     $petugas = $_POST['petugas'];
-    $qty = $_POST['qty'];
 
-    $cekstocksekarang = mysqli_query($conn, "select * from stock where barcode= '$barcodenya'");
-    $ambildatanya = mysqli_fetch_array($cekstocksekarang);
+    // Ambil detail barang dari tabel stock
+    $cek = mysqli_query($conn, "SELECT * FROM stock WHERE barcode='$barcode'");
+    $data = mysqli_fetch_assoc($cek);
 
-    $stocksekarang = $ambildatanya['stock'];
-    $tambahkanstocksekarangdenganquantity = $stocksekarang+$qty;
+    if ($data) {
+        $namabarang = $data['namabarang'];
+        $satuan = $data['satuan'];
 
-    $addtomasuk = mysqli_query($conn,"INSERT INTO masuk (barcode, petugas, qty) values('$$barcodenya', '$penerima', '$qty')");
-    $updatestockmasuk = mysqli_query($conn, "update stock set stock= '$tambahkanstocksekarangdenganquantity' where barcode= '$$barcodenya'");
-    if($addtomasuk&&$updatestockmasuk) {
-        header('location:masuk.php');
+        // Insert ke tabel masuk
+        $insert = mysqli_query($conn, "INSERT INTO masuk (barcode, namabarang, satuan, qty, petugas) VALUES (
+            '$barcode',
+            '$namabarang',
+            '$satuan',
+            '$qty',
+            '$petugas'
+        )");
+
+        if ($insert) {
+            // Update qty di tabel stock
+            $update = mysqli_query($conn, "UPDATE stock SET qty = qty + $qty WHERE barcode='$barcode'");
+
+            if ($update) {
+                //echo "<script>alert('Barang masuk berhasil ditambahkan'); window.location.href='masuk.php';</script>";
+            } else {
+                //echo "<script>alert('Gagal update stock');</script>";
+            }
+        } else {
+            //echo "<script>alert('Gagal insert ke tabel masuk');</script>";
+        }
     } else {
-        echo 'Input Gagal';
-        header('location:masuk.php');
+        //echo "<script>alert('Barcode tidak ditemukan di tabel stock');</script>";
     }
 }
 
@@ -54,9 +72,9 @@ if (isset($_POST['barcode'])) {
     $data = mysqli_fetch_array($query);
     
     if ($data) {
-        echo $data['namabarang'];
+        //echo $data['namabarang'];
     } else {
-        echo "";
+       //echo "";
     }
 }
 
