@@ -64,6 +64,45 @@ if (isset($_POST['tambahbarangmasuk'])) {
         //echo "<script>alert('Barcode tidak ditemukan di tabel stock');</script>";
     }
 }
+//menambah barang keluar
+if (isset($_POST['tambahbarangkeluar'])) {
+    $barcode = $_POST['barcode'];
+    $qty = intval($_POST['qty']);
+    $petugas = $_POST['petugas'];
+
+    // Ambil detail barang dari tabel stock
+    $cek = mysqli_query($conn, "SELECT * FROM stock WHERE barcode='$barcode'");
+    $data = mysqli_fetch_assoc($cek);
+
+    if ($data) {
+        $namabarang = $data['namabarang'];
+        $satuan = $data['satuan'];
+
+        // Insert ke tabel masuk
+        $insert = mysqli_query($conn, "INSERT INTO keluar (barcode, namabarang, satuan, qty, petugas) VALUES (
+            '$barcode',
+            '$namabarang',
+            '$satuan',
+            '$qty',
+            '$petugas'
+        )");
+
+        if ($insert) {
+            // Update qty di tabel stock
+            $update = mysqli_query($conn, "UPDATE stock SET qty = qty - $qty WHERE barcode='$barcode'");
+
+            if ($update) {
+                //echo "<script>alert('Barang masuk berhasil ditambahkan'); window.location.href='masuk.php';</script>";
+            } else {
+                //echo "<script>alert('Gagal update stock');</script>";
+            }
+        } else {
+            //echo "<script>alert('Gagal insert ke tabel masuk');</script>";
+        }
+    } else {
+        //echo "<script>alert('Barcode tidak ditemukan di tabel stock');</script>";
+    }
+}
 
 // get nama barang
 if (isset($_POST['barcode'])) {
@@ -78,26 +117,5 @@ if (isset($_POST['barcode'])) {
     }
 }
 
-//menambah barang keluar
-if(isset($_POST['addbarangkeluar'])){
-    $barangnya = $_POST['barangnya'];
-    $penerima = $_POST['penerima'];
-    $qty = $_POST['qty'];
-
-    $cekstocksekarang = mysqli_query($conn, "select * from stock where idbarang= '$barangnya'");
-    $ambildatanya = mysqli_fetch_array($cekstocksekarang);
-
-    $stocksekarang = $ambildatanya['stock'];
-    $tambahkanstocksekarangdenganquantity = $stocksekarang-$qty;
-
-    $addtokeluar = mysqli_query($conn,"INSERT INTO keluar (idbarang, penerima, qty) values('$barangnya', '$penerima', '$qty')");
-    $updatestockkeluar = mysqli_query($conn, "update stock set stock= '$tambahkanstocksekarangdenganquantity' where idbarang= '$barangnya'");
-    if($addtokeluar&&$updatestockkeluar) {
-        header('location:keluar.php');
-    } else {
-        echo 'Input Gagal';
-        header('location:keluar.php');
-    }
-}
 
 ?>
