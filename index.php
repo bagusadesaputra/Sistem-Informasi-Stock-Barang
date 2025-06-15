@@ -144,8 +144,14 @@ require 'cek.php'
             <form method="post">
             <div class="modal-body">
                 <p>Barcode</p>
-                <input type="text" name="barcode" class="form-control" required>
-                <br>
+                    <div class="input-group mb-3">
+                        <input type="text" id="barcode" name="barcode" class="form-control" required>
+                        <div class="input-group-append">
+                            <button class="btn btn-success" type="button" id="btnBarcode">
+                                <i class="fas fa-camera"></i>  Scan
+                            </button>
+                        </div>
+                    </div>
                 <p>Nama Barang</p>
                 <input type="text" name="namabarang" class="form-control" required>
                 <br>
