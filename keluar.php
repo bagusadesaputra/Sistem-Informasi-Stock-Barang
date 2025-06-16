@@ -181,6 +181,73 @@ require 'cek.php'
                 });
             </script>
 
+            <!-- Barcode Scanner -->
+            <script>
+                function startScanner() {
+                    document.getElementById('scanner-container').style.display = 'flex';
+                    Quagga.init({
+                        inputStream: {
+                            name: "Live",
+                            type: "LiveStream",
+                            target: document.querySelector('#scanner')
+                        },
+                        decoder: {
+                            readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader", "code_39_reader"]
+                        }
+                    }, function (err) {
+                        if (err) {
+                            console.log(err);
+                            alert("Error: " + err);
+                            return;
+                        }
+                        Quagga.start();
+                    });
+
+                    Quagga.onDetected(function (result) {
+                        var kode = result.codeResult.code;
+                        document.getElementById('barcode').value = kode;
+                        fetchBarang(kode); // PANGGIL AJAX untuk mengisi nama dan satuan
+                        stopScanner(); // otomatis close scanner setelah dapat barcode
+                    });
+                }
+
+                function stopScanner() {
+                    Quagga.stop();
+                    document.getElementById('scanner-container').style.display = 'none';
+                }
+            </script>
+
+            <script>
+                function fetchBarang(barcode) {
+                    fetch('get_barang.php', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/x-www-form-urlencoded'
+                        },
+                        body: 'barcode=' + encodeURIComponent(barcode)
+                    })
+                    .then(response => response.text()) // ubah dulu ke .text() untuk debug
+                    .then(data => {
+                        console.log('Respon dari PHP:', data); // LIHAT apa yang dikembalikan
+                        try {
+                            let json = JSON.parse(data);
+                            if (json.namabarang && json.satuan) {
+                                document.getElementById('namabarang').value = json.namabarang;
+                                document.getElementById('satuan').value = json.satuan;
+                            } else {
+                                alert("Data tidak ditemukan");
+                            }
+                        } catch (e) {
+                            console.error("Gagal parse JSON:", e);
+                            alert("Respon bukan JSON: " + data);
+                        }
+                    })
+                    .catch(error => {
+                        console.error("AJAX Error:", error);
+                    });
+                }
+            </script>
+
     <!-- End of Script -->\
 
     </body>
@@ -203,7 +270,7 @@ require 'cek.php'
                     <div class="input-group mb-3">
                         <input type="text" id="barcode" name="barcode" class="form-control" required>
                         <div class="input-group-append">
-                            <button class="btn btn-success" type="button" id="btnBarcode">
+                            <button class="btn btn-success" type="button" id="btnBarcode" onclick="startScanner()">
                                 <i class="fas fa-camera"></i>  Scan
                             </button>
                         </div>
@@ -229,5 +296,11 @@ require 'cek.php'
         </div>
     </div>
 </div>
+
+    <!-- Scanner Container -->
+    <div id="scanner-container" style="display:none; justify-content:center; align-items:center; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:9999;">
+        <div id="scanner" style="width:500px; height:400px; background-color:#fff;"></div>
+        <button type="button" class="btn btn-danger mt-3" onclick="stopScanner()">Tutup</button>
+    </div>
 
 </html>

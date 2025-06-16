@@ -78,7 +78,7 @@ if (isset($_POST['tambahbarangkeluar'])) {
         $namabarang = $data['namabarang'];
         $satuan = $data['satuan'];
 
-        // Insert ke tabel masuk
+        // Insert ke tabel keluar
         $insert = mysqli_query($conn, "INSERT INTO keluar (barcode, namabarang, satuan, qty, petugas) VALUES (
             '$barcode',
             '$namabarang',
