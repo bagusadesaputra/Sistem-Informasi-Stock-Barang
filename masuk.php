@@ -13,6 +13,7 @@ require 'cek.php'
         <title>Barang Masuk</title>
         <link href="css/styles.css" rel="stylesheet" />
         <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
+        <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" rel="stylesheet" >
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
 
     </head>
@@ -34,7 +35,7 @@ require 'cek.php'
                     <!-- List -->
                         <div class="nav">
                             <a class="nav-link" href="index.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                <div class="sb-nav-link-icon"><i class="fas fa-solid fa-warehouse"></i></div>
                                 Stock Barang
                             </a>
                             <a class="nav-link" href="masuk.php">
@@ -44,6 +45,10 @@ require 'cek.php'
                             <a class="nav-link" href="keluar.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Barang Keluar
+                            </a>
+                            <a class="nav-link" href="petugas.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                Petugas
                             </a>
                             <a class="nav-link" href="logout.php">
                                 Logout
@@ -63,11 +68,18 @@ require 'cek.php'
                         <h1 class="mt-4">Barang Masuk</h1>
                         <div class="card mb-4">
 
-                            <!-- Button to Open the Modal -->
                             <div class="card-header">
+
+                            <!-- Button to Open the Modal -->
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
                                     Tambah Barang
                                 </button>
+
+                                <!-- Button to Print Reports -->
+                                <button type="button" class="btn btn-success" id="btnCetak">
+                                    Cetak Laporan
+                                </button>
+
                             </div>
 
                             <!-- Data Table -->
@@ -77,12 +89,12 @@ require 'cek.php'
                                         <thead>
                                             <tr>
                                                 <th>No</th>
+                                                <th>Tanggal & Waktu</th>
                                                 <th>Barcode</th>
                                                 <th>Nama Barang</th>
                                                 <th>Satuan</th>
                                                 <th>Jumlah Masuk</th>
                                                 <th>Petugas
-                                                <th>Tanggal & Waktu</th>
                                                 </th>
                                             </tr>
                                         </thead>
@@ -91,22 +103,22 @@ require 'cek.php'
                                             $ambilsemuadatastock = mysqli_query($conn, "select * from masuk");
                                             $i = 1;
                                             while ($data=mysqli_fetch_array($ambilsemuadatastock)){
+                                                $tgl = $data['tgl'];
                                                 $barcode = $data['barcode'];
                                                 $namabarang = $data['namabarang'];
                                                 $satuan = $data['satuan'];
                                                 $qty = $data['qty'];
                                                 $petugas = $data['petugas'];
-                                                $tgl = $data['tgl'];
                                             ?>
 
                                             <tr>
                                                 <td><?=$i++;?></td>
+                                                <td><?=$tgl;?></td>
                                                 <td><?=$barcode;?></td>
                                                 <td><?=$namabarang;?></td>
                                                 <td><?=$satuan;?></td>
                                                 <td><?=$qty;?></td>
                                                 <td><?=$petugas;?></td>
-                                                <td><?=$tgl;?></td>
                                             </tr>
                                             <?php
 
@@ -147,8 +159,10 @@ require 'cek.php'
         <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
         <script src="assets/demo/datatables-demo.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
         <script src="js/scripts.js"></script>
-
         <!-- Functions -->
         
             <!-- AJAX - Autofill text dari barcode -->
@@ -182,43 +196,7 @@ require 'cek.php'
                     });
                 });
             </script>
-
-            <!-- Barcode Scanner -->
-            <script>
-                function startScanner() {
-                    document.getElementById('scanner-container').style.display = 'flex';
-                    Quagga.init({
-                        inputStream: {
-                            name: "Live",
-                            type: "LiveStream",
-                            target: document.querySelector('#scanner')
-                        },
-                        decoder: {
-                            readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader", "code_39_reader"]
-                        }
-                    }, function (err) {
-                        if (err) {
-                            console.log(err);
-                            alert("Error: " + err);
-                            return;
-                        }
-                        Quagga.start();
-                    });
-
-                    Quagga.onDetected(function (result) {
-                        var kode = result.codeResult.code;
-                        document.getElementById('barcode').value = kode;
-                        fetchBarang(kode); // PANGGIL AJAX untuk mengisi nama dan satuan
-                        stopScanner(); // otomatis close scanner setelah dapat barcode
-                    });
-                }
-
-                function stopScanner() {
-                    Quagga.stop();
-                    document.getElementById('scanner-container').style.display = 'none';
-                }
-            </script>
-
+            
             <script>
                 function fetchBarang(barcode) {
                     fetch('get_barang.php', {
@@ -250,6 +228,68 @@ require 'cek.php'
                 }
             </script>
 
+            <!-- Barcode Scanner -->
+            <script>
+                function startScanner() {
+                    document.getElementById('scanner-container').style.display = 'flex';
+                    Quagga.init({
+                        inputStream: {
+                            name: "Live",
+                            type: "LiveStream",
+                            target: document.querySelector('#scanner')
+                        },
+                        decoder: {
+                            readers: ["code_128_reader", "ean_reader", "ean_8_reader", "upc_reader", "code_39_reader"]
+                        }
+                    }, function (err) {
+                        if (err) {
+                            console.log(err);
+                            alert("Error: " + err);
+                            return;
+                        }
+                        Quagga.start();
+                    });
+                    Quagga.onDetected(function (result) {
+                        var kode = result.codeResult.code;
+                        document.getElementById('barcode').value = kode;
+                        fetchBarang(kode); // PANGGIL AJAX untuk mengisi nama dan satuan
+                        stopScanner(); // otomatis close scanner setelah dapat barcode
+                    });
+                }
+
+                function stopScanner() {
+                    Quagga.stop();
+                    document.getElementById('scanner-container').style.display = 'none';
+                }
+            </script>
+
+            <!-- Untuk Ekspor datatable menjadi csv -->
+            <script>
+                $(document).ready(function () {
+                    // Hancurkan jika sebelumnya sudah ada
+                    if ($.fn.DataTable.isDataTable('#dataTable')) {
+                        $('#dataTable').DataTable().destroy();
+                    }
+
+                    // Inisialisasi ulang dengan tombol CSV
+                    var table = $('#dataTable').DataTable({
+                        dom: 'Bfrtip',
+                        buttons: [
+                            {
+                                extend: 'csvHtml5',
+                                title: 'Laporan_BarangMasuk',
+                                className: 'd-none' // tombol tidak terlihat
+                            }
+                        ]
+                    });
+
+                    // Saat tombol diklik, trigger ekspor
+                    $('#btnCetak').on('click', function () {
+                        table.button('.buttons-csv').trigger();
+                    });
+                });
+            </script>
+
     <!-- End of Script -->
 
     </body>
@@ -267,32 +307,37 @@ require 'cek.php'
 
                 <!-- Modal body -->
                 <form method="post">
-                <div class="modal-body">
-                    <p>Barcode</p>
-                    <div class="input-group mb-3">
-                        <input type="text" id="barcode" name="barcode" class="form-control" required>
-                        <div class="input-group-append">
-                            <button class="btn btn-success" type="button" id="btnBarcode" onclick="startScanner()">
-                                <i class="fas fa-camera"></i>  Scan
-                            </button>
+                    <div class="modal-body">
+                        <label>Barcode</label>
+                        <div class="input-group mb-3">
+                            <input type="text" id="barcode" name="barcode" class="form-control" required>
+                            <div class="input-group-append">
+                                <button class="btn btn-success" type="button" id="btnBarcode" onclick="startScanner()">
+                                    <i class="fas fa-camera"></i>  Scan
+                                </button>
+                            </div>
                         </div>
-                    </div>
 
-                    <p>Nama Barang</p>
-                    <input type="text" id="namabarang" name="namabarang" class="form-control" readonly>
-                    <br>
-                    <p>Satuan</p>
-                    <input type="text" id="satuan" name="satuan" class="form-control" readonly>
-                    <br>
-                    <p>Quantity</p>
-                    <input type="number" name="qty" placeholder="0" class="form-control" required>
-                    <br>
-                    <p>Petugas</p>
-                    <input type="text" name="petugas" class="form-control" required>
-                    <br>
-                    <button type="submit" class="btn btn-primary" name="tambahbarangmasuk">Submit</button>
-                </div>
-            </form>
+                        <label>Nama Barang</label>
+                        <input type="text" id="namabarang" name="namabarang" class="form-control" readonly>
+                        <br>
+                        <label>Satuan</label>
+                        <input type="text" id="satuan" name="satuan" class="form-control" readonly>
+                        <br>
+                        <label>Quantity</label>
+                        <input type="number" name="qty" placeholder="0" class="form-control" required>
+                        <br>
+                        <label>Petugas</label>
+                        <select name="petugas" class="form-control" required>
+                            <option value="">-- Pilih Petugas --</option>
+                            <?php while ($p = mysqli_fetch_array($data_petugas)) { ?>
+                                <option value="<?= $p['namapetugas'] ?>"><?= $p['namapetugas'] ?></option>
+                            <?php } ?>
+                        </select>
+                        <br>
+                        <button type="submit" class="btn btn-primary" name="tambahbarangmasuk">Submit</button>
+                    </div>
+                </form>
 
             </div>
         </div>
