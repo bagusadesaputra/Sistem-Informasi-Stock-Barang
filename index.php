@@ -13,6 +13,7 @@ require 'cek.php'
         <title>Daftar Barang</title>
         <link href="css/styles.css" rel="stylesheet" />
         <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
+        <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" rel="stylesheet" >
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
 
     </head>
@@ -45,6 +46,10 @@ require 'cek.php'
                                 <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
                                 Barang Keluar
                             </a>
+                            <a class="nav-link" href="petugas.php">
+                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                Petugas
+                            </a>
                             <a class="nav-link" href="logout.php">
                                 Logout
                             </a>
@@ -62,11 +67,18 @@ require 'cek.php'
                         <h1 class="mt-4">Stock Barang</h1>
                         <div class="card mb-4">
 
-                            <!-- Button to Open the Modal -->
                             <div class="card-header">
+
+                            <!-- Button to Open the Modal -->
                                 <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#myModal">
                                     Tambah Barang
                                 </button>
+
+                                <!-- Button to Print Reports -->
+                                <button type="button" class="btn btn-success" id="btnCetak">
+                                    Cetak Laporan
+                                </button>
+
                             </div>
 
                             <!-- Data Table-->
@@ -143,6 +155,9 @@ require 'cek.php'
         <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
         <script src="assets/demo/datatables-demo.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
+        <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
         <script src="js/scripts.js"></script>
 
             <!-- Barcode Scanner -->
@@ -179,6 +194,33 @@ require 'cek.php'
                     Quagga.stop();
                     document.getElementById('scanner-container').style.display = 'none';
                 }
+            </script>
+
+            <!-- Untuk Ekspor datatable menjadi csv -->
+            <script>
+                $(document).ready(function () {
+                    // Hancurkan jika sebelumnya sudah ada
+                    if ($.fn.DataTable.isDataTable('#dataTable')) {
+                        $('#dataTable').DataTable().destroy();
+                    }
+
+                    // Inisialisasi ulang dengan tombol CSV
+                    var table = $('#dataTable').DataTable({
+                        dom: 'Bfrtip',
+                        buttons: [
+                            {
+                                extend: 'csvHtml5',
+                                title: 'Laporan_Data',
+                                className: 'd-none' // tombol tidak terlihat
+                            }
+                        ]
+                    });
+
+                    // Saat tombol diklik, trigger ekspor
+                    $('#btnCetak').on('click', function () {
+                        table.button('.buttons-csv').trigger();
+                    });
+                });
             </script>
 
     </body>
