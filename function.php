@@ -64,6 +64,9 @@ if (isset($_POST['tambahbarangmasuk'])) {
         //echo "<script>alert('Barcode tidak ditemukan di tabel stock');</script>";
     }
 }
+// option data petugas
+$data_petugas = mysqli_query($conn, "SELECT * FROM petugas");
+
 //menambah barang keluar
 if (isset($_POST['tambahbarangkeluar'])) {
     $barcode = $_POST['barcode'];
@@ -114,6 +117,22 @@ if (isset($_POST['barcode'])) {
         //echo $data['namabarang'];
     } else {
        //echo "";
+    }
+}
+
+
+//menambah petugas baru
+if(isset($_POST['tambahpetugasbaru'])){
+    $namapetugas = $_POST['namapetugas'];
+    $alamat = $_POST['alamat'];
+    $notelp = $_POST['notelp'];
+
+    $addtotable = mysqli_query($conn, "INSERT INTO petugas (namapetugas, alamat, notelp) VALUES ('$namapetugas', '$alamat', '$notelp')");
+    if($addtotable) {
+        header('location:petugas.php');
+    } else {
+        //echo 'Input Gagal';
+        header('location:petugas.php');
     }
 }
 
