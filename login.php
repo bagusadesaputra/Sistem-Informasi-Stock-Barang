@@ -1,5 +1,6 @@
-<?php
-require 'function.php';
+ <?php
+require 'config/koneksi.php';
+require 'functions/function.php';
 
 //cek login terdaftar atau tidak
 if(isset($_POST['login'])){

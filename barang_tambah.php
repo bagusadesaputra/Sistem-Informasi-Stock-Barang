@@ -3,7 +3,6 @@ require 'config/koneksi.php';
 require 'functions/barang_functions.php';
 require 'config/cek.php';
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -12,7 +11,7 @@ require 'config/cek.php';
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Daftar Barang</title>
+        <title>Barang</title>
         <link href="css/styles.css" rel="stylesheet" />
         <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
         <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" rel="stylesheet" >
@@ -40,8 +39,9 @@ require 'config/cek.php';
             <div id="layoutSidenav_nav">
                 <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
-                        <!-- List -->
+                    <!-- List -->
                         <div class="nav">
+                            
                             <div class="sb-sidenav-menu-heading">Master</div>
                             <a class="nav-link" href="index.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-dolly-flatbed"></i></div>
@@ -91,109 +91,62 @@ require 'config/cek.php';
                 </nav>
             </div>
         <!-- End Navigation Bar -->
-        <!-- page of Content -->
+        <!-- Page of Content -->
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid">
                         <h1 class="mt-4"></h1>
-
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item"><strong>Barang</strong></li>
+                            <li class="breadcrumb-item"><a href="index.php">Barang</a></li>
+                            <li class="breadcrumb-item"><strong>Tambah</strong></li>
                         </ol>
-                        <div class="card mb-4">
-                            <!-- Data Table-->
-                            <div class="card-header">
-                                <i class="fas fa-table"></i> DataTable Barang
-                            </div>
+                        <div class="card shadow mb-4">
+                            <div class="card-header">Tambah Barang</div>
                             <div class="card-body">
-                                <div class="row mb-3">
-                                    <!-- Kolom kiri: Dropdown Data Length + Search -->
-                                    <div class="col-lg-9">
-                                        <div class="row align-items-center">
-                                            <!-- Dropdown Data Length -->
-                                            <div class="col-auto mb-2">
-                                                <label class="d-flex align-items-center mb-0">
-                                                    Show
-                                                    <select id="customLength" class="custom-select custom-select-sm form-control form-control-sm mx-2">
-                                                        <option value="10">10</option>
-                                                        <option value="25">25</option>
-                                                        <option value="50">50</option>
-                                                        <option value="100">100</option>
-                                                    </select>
-                                                    entries
-                                                </label>
-                                            </div>
-                                            <!-- Search -->
-                                            <div class="col-md-4 mb-2 ml-md-3">
-                                                <input type="text" id="customSearch" class="form-control" placeholder="Cari Barang">
+                                <form method="post">
+                                    <div class="modal-body">
+                                        <p>Barcode</p>
+                                        <div class="input-group mb-3">
+                                            <input type="text" id="barcode" name="barcode" class="form-control" required>
+                                            <div class="input-group-append">
+                                                <button class="btn btn-success" type="button" id="btnBarcode" onclick="startScanner()">
+                                                    <i class="fas fa-camera"></i>  Scan
+                                                </button>
                                             </div>
                                         </div>
-                                    </div>
-                                    <!-- Kolom kanan: Tombol Aksi -->
-                                    <div class="col-lg-3 d-flex justify-content-lg-end flex-wrap align-items-start">
-                                        <a href="barang_tambah.php" class="btn btn-primary mr-2 mb-2">
-                                            <i class="fas fa-plus"></i> Tambah
-                                        </a>
-                                        <button id="btnCetak" class="btn btn-secondary mb-2">
-                                            <i class="fas fa-print"></i> Print
-                                        </button>
-                                    </div>
-                                </div>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                        <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>Barcode</th>
-                                                <th>Nama Barang</th>
-                                                <th>Jenis Barang</th>
-                                                <th>Lokasi</th>
-                                                <th>Satuan</th>
-                                                <th>Jumlah Sistem</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            $ambilsemuadatastock = mysqli_query($conn, "
-                                                SELECT s.*, o.jumlah_fisik
-                                                FROM stock s
-                                                LEFT JOIN opname o ON o.barcode = s.barcode
-                                            ");
-                                            $i = 1;
-                                            while ($data = mysqli_fetch_array($ambilsemuadatastock)) {
-                                                $barcode = $data['barcode'];
-                                                $namabarang = $data['namabarang'];
-                                                $jenis_barang = $data['jenis_barang'];
-                                                $lokasi = $data['lokasi'];
-                                                $satuan = $data['satuan'];
-                                                $qty = $data['qty'];
-                                            ?>
-                                            <tr>
-                                                <td><?= $i++; ?></td>
-                                                <td><?= $barcode; ?></td>
-                                                <td><?= $namabarang; ?></td>
-                                                <td><?= $jenis_barang; ?></td>
-                                                <td><?= $lokasi; ?></td>
-                                                <td><?= $satuan; ?></td>
-                                                <td><?= $qty; ?></td>
-                                                <td>
-                                                    <div class="d-flex">
-                                                        <!-- Tombol Edit -->
-                                                            <a href="barang_edit.php?barcode=<?= $data['barcode']; ?>" class="btn btn-warning btn-sm mr-1">
-                                                                <i class="fas fa-edit"></i>
-                                                            </a> 
-                                                        <form method="post" onsubmit="return confirm('Yakin ingin menghapus data ini?');">
-                                                            <input type="hidden" name="barcodehapus" value="<?= $barcode; ?>">
-                                                            <button type="submit" name="hapusbarang" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
+                                        <p>Nama Barang</p>
+                                        <input type="text" name="namabarang" class="form-control" required>
+                                        <br>
+                                        <label>Jenis</label>
+                                        <select name="jenis" class="form-control" required>
+                                            <option value="">-- Pilih Jenis Barang --</option>
+                                            <?php while ($p = mysqli_fetch_array($data_jenis)) { ?>
+                                                <option value="<?= $p['jenis_barang'] ?>"><?= $p['jenis_barang'] ?></option>
                                             <?php } ?>
-                                        </tbody>
-                                    </table>
-                                </div>
+                                        </select>
+                                        <br>
+                                        <label>Lokasi</label>
+                                        <select name="lokasi" class="form-control" required>
+                                            <option value="">-- Pilih Lokasi --</option>
+                                            <?php while ($p = mysqli_fetch_array($data_lokasi)) { ?>
+                                                <option value="<?= $p['lokasi_barang'] ?>"><?= $p['lokasi_barang'] ?></option>
+                                            <?php } ?>
+                                        </select>
+                                        <br>
+                                        <p>Satuan</p>
+                                        <select name="satuan" class="form-control" required>
+                                            <option value="">-- Pilih Satuan --</option>
+                                            <?php while ($p = mysqli_fetch_array($data_satuan)) { ?>
+                                                <option value="<?= $p['satuan_barang'] ?>"><?= $p['satuan_barang'] ?></option>
+                                            <?php } ?>
+                                        </select>
+                                        <br>
+                                        <p>Quantity</p>
+                                        <input type="number" name="qty" placeholder="0" class="form-control" required>
+                                        <br>
+                                        <button type="submit" class="btn btn-primary" name="addnewbarang">Submit</button>
+                                    </div>
+                                </form>
                             </div>
                         </div>
                     </div>
@@ -202,7 +155,7 @@ require 'config/cek.php';
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid">
                         <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">Copyright &copy; Rumah Parquet 2025</div>
+                            <div class="text-muted">Copyright &copy; Your Website 2020</div>
                         </div>
                     </div>
                 </footer>
@@ -223,6 +176,13 @@ require 'config/cek.php';
         <script src="assets/js/datatable.js"></script>
         <script src="assets/js/scanner.js"></script>
         <script src="assets/js/ui.js"></script>
+        <!-- Functions -->
     <!-- End of Script -->
     </body>
+    <!-- Scanner Container -->
+    <div id="scanner-container" style="display:none; justify-content:center; align-items:center; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:9999;">
+        <div id="scanner" style="width:500px; height:400px; background-color:#fff;"></div>
+        <button type="button" class="btn btn-danger mt-3" onclick="stopScanner()">Tutup</button>
+    </div>
+
 </html>

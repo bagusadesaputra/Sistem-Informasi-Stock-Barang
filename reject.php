@@ -1,9 +1,8 @@
  <?php
 require 'config/koneksi.php';
-require 'functions/barang_functions.php';
+require 'functions/reject_functions.php';
 require 'config/cek.php';
 ?>
-
 <!DOCTYPE html>
 <html lang="en">
     <head>
@@ -12,10 +11,10 @@ require 'config/cek.php';
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Daftar Barang</title>
+        <title>Barang Reject</title>
         <link href="css/styles.css" rel="stylesheet" />
         <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
-        <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" rel="stylesheet" >
+        <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" rel="stylesheet">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/js/all.min.js" crossorigin="anonymous"></script>
     </head>
     <body class="sb-nav-fixed">
@@ -41,7 +40,7 @@ require 'config/cek.php';
                 <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
                     <div class="sb-sidenav-menu">
                         <!-- List -->
-                        <div class="nav">
+                        <div class="nav">              
                             <div class="sb-sidenav-menu-heading">Master</div>
                             <a class="nav-link" href="index.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-dolly-flatbed"></i></div>
@@ -63,7 +62,6 @@ require 'config/cek.php';
                                 <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
                                 Petugas
                             </a>
-                            
                             <div class="sb-sidenav-menu-heading">Transaksi Barang</div>
                             <a class="nav-link" href="opname.php">
                                 <div class="sb-nav-link-icon"><i class="fas fa-cubes"></i></div>
@@ -91,108 +89,126 @@ require 'config/cek.php';
                 </nav>
             </div>
         <!-- End Navigation Bar -->
-        <!-- page of Content -->
+            <!-- page of Content -->
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid">
                         <h1 class="mt-4"></h1>
-
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item"><strong>Barang</strong></li>
+                            <li class="breadcrumb-item"><strong>Barang Reject</strong></li>
                         </ol>
                         <div class="card mb-4">
-                            <!-- Data Table-->
+                            <!-- Data Table -->
                             <div class="card-header">
-                                <i class="fas fa-table"></i> DataTable Barang
+                                <i class="fas fa-table"></i> DataTable Reject
                             </div>
                             <div class="card-body">
                                 <div class="row mb-3">
-                                    <!-- Kolom kiri: Dropdown Data Length + Search -->
+                                    <!-- Kolom kiri: Search + Tanggal -->
                                     <div class="col-lg-9">
-                                        <div class="row align-items-center">
+                                        <div class="row">
                                             <!-- Dropdown Data Length -->
                                             <div class="col-auto mb-2">
                                                 <label class="d-flex align-items-center mb-0">
-                                                    Show
                                                     <select id="customLength" class="custom-select custom-select-sm form-control form-control-sm mx-2">
                                                         <option value="10">10</option>
                                                         <option value="25">25</option>
                                                         <option value="50">50</option>
                                                         <option value="100">100</option>
                                                     </select>
-                                                    entries
                                                 </label>
                                             </div>
                                             <!-- Search -->
-                                            <div class="col-md-4 mb-2 ml-md-3">
-                                                <input type="text" id="customSearch" class="form-control" placeholder="Cari Barang">
+                                            <div class="col-sm-12 col-md-3 mb-2">
+                                                <input type="text" id="customSearch" class="form-control" placeholder="Cari Barang Reject">
+                                            </div>
+                                            <!-- Min Date -->
+                                            <div class="col-sm-6 col-md-3 mb-2">
+                                                <input type="date" id="minDate" class="form-control" placeholder="Dari Tanggal">
+                                            </div>
+                                            <!-- Max Date -->
+                                            <div class="col-sm-6 col-md-3 mb-2">
+                                                <input type="date" id="maxDate" class="form-control" placeholder="Sampai Tanggal">
+                                            </div>
+                                            <!-- Filter Button -->
+                                            <div class="col-sm-12 col-md-1 mb-2">
+                                                <button class="btn btn-info w-100" id="btnFilterTanggal">
+                                                    <i class="fas fa-filter"></i>
+                                                </button>
                                             </div>
                                         </div>
                                     </div>
                                     <!-- Kolom kanan: Tombol Aksi -->
                                     <div class="col-lg-3 d-flex justify-content-lg-end flex-wrap align-items-start">
-                                        <a href="barang_tambah.php" class="btn btn-primary mr-2 mb-2">
+                                        <a href="reject_tambah.php" class="btn btn-primary mr-2 mb-2">
                                             <i class="fas fa-plus"></i> Tambah
                                         </a>
                                         <button id="btnCetak" class="btn btn-secondary mb-2">
                                             <i class="fas fa-print"></i> Print
                                         </button>
                                     </div>
-                                </div>
+                                </div> 
                                 <div class="table-responsive">
                                     <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
                                         <thead>
                                             <tr>
-                                                <th>No</th>
-                                                <th>Barcode</th>
-                                                <th>Nama Barang</th>
-                                                <th>Jenis Barang</th>
-                                                <th>Lokasi</th>
-                                                <th>Satuan</th>
-                                                <th>Jumlah Sistem</th>
-                                                <th>Aksi</th>
+                                            <th>No</th>
+                                            <th>Tanggal</th>
+                                            <th>Barcode</th>
+                                            <th>Nama Barang</th>
+                                            <th>Satuan</th>
+                                            <th>Jumlah</th>
+                                            <th>Petugas</th>
+                                            <th>Keterangan</th>
+                                            <th>Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $ambilsemuadatastock = mysqli_query($conn, "
-                                                SELECT s.*, o.jumlah_fisik
-                                                FROM stock s
-                                                LEFT JOIN opname o ON o.barcode = s.barcode
-                                            ");
-                                            $i = 1;
-                                            while ($data = mysqli_fetch_array($ambilsemuadatastock)) {
-                                                $barcode = $data['barcode'];
-                                                $namabarang = $data['namabarang'];
-                                                $jenis_barang = $data['jenis_barang'];
-                                                $lokasi = $data['lokasi'];
-                                                $satuan = $data['satuan'];
-                                                $qty = $data['qty'];
-                                            ?>
-                                            <tr>
-                                                <td><?= $i++; ?></td>
-                                                <td><?= $barcode; ?></td>
-                                                <td><?= $namabarang; ?></td>
-                                                <td><?= $jenis_barang; ?></td>
-                                                <td><?= $lokasi; ?></td>
-                                                <td><?= $satuan; ?></td>
-                                                <td><?= $qty; ?></td>
-                                                <td>
-                                                    <div class="d-flex">
-                                                        <!-- Tombol Edit -->
-                                                            <a href="barang_edit.php?barcode=<?= $data['barcode']; ?>" class="btn btn-warning btn-sm mr-1">
-                                                                <i class="fas fa-edit"></i>
-                                                            </a> 
-                                                        <form method="post" onsubmit="return confirm('Yakin ingin menghapus data ini?');">
-                                                            <input type="hidden" name="barcodehapus" value="<?= $barcode; ?>">
-                                                            <button type="submit" name="hapusbarang" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>
-                                                        </form>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                            <?php } ?>
+                                                $ambildatareject = mysqli_query($conn, "SELECT * FROM reject_barang ORDER BY tanggal DESC");
+                                                $no = 1;
+                                                // Daftar bulan Indonesia
+                                                $bulanIndo = [
+                                                    'January' => 'Januari', 'February' => 'Februari', 'March' => 'Maret',
+                                                    'April' => 'April', 'May' => 'Mei', 'June' => 'Juni',
+                                                    'July' => 'Juli', 'August' => 'Agustus', 'September' => 'September',
+                                                    'October' => 'Oktober', 'November' => 'November', 'December' => 'Desember'
+                                                ];
+                                                while ($data = mysqli_fetch_array($ambildatareject)) {
+                                                    $id = $data['id_reject'];
+                                                    // Format tanggal untuk tampilan dan sorting
+                                                    $tglSort = date('Y-m-d', strtotime($data['tanggal']));
+                                                    $tanggalIndo = strtr(date('d F Y', strtotime($data['tanggal'])), $bulanIndo);
+                                                    $barcode = $data['barcode'];
+                                                    $namabarang = $data['namabarang'];
+                                                    $satuan = $data['satuan'];
+                                                    $jumlah = $data['jumlah'];
+                                                    $petugas = $data['petugas'];
+                                                    $keterangan = $data['keterangan'];
+                                                ?>
+                                                    <tr>
+                                                        <td><?= $no++; ?></td>
+                                                        <td data-sort="<?= $tglSort; ?>"><?= $tanggalIndo; ?></td>
+                                                        <td><?= $barcode; ?></td>
+                                                        <td><?= $namabarang; ?></td>
+                                                        <td><?= $satuan; ?></td>
+                                                        <td><?= $jumlah; ?></td>
+                                                        <td><?= $petugas; ?></td>
+                                                        <td><?= htmlspecialchars($keterangan); ?></td>
+                                                        <td>
+                                                            <form method="post" onsubmit="return confirm('Yakin ingin menghapus data ini?');">
+                                                                <input type="hidden" name="id_reject" value="<?= $id; ?>">
+                                                                <button type="submit" name="hapusreject" class="btn btn-danger btn-sm">
+                                                                    <i class="fas fa-trash-alt"></i>
+                                                                </button>
+                                                            </form>
+                                                        </td>
+                                                    </tr>
+                                                <?php
+                                                } 
+                                                ?>
                                         </tbody>
-                                    </table>
+                                        </table>
                                 </div>
                             </div>
                         </div>
@@ -202,12 +218,12 @@ require 'config/cek.php';
                 <footer class="py-4 bg-light mt-auto">
                     <div class="container-fluid">
                         <div class="d-flex align-items-center justify-content-between small">
-                            <div class="text-muted">Copyright &copy; Rumah Parquet 2025</div>
+                            <div class="text-muted">Copyright &copy; Your Website 2020</div>
                         </div>
                     </div>
                 </footer>
             </div>
-        <!-- End of Page Content -->
+        <!-- End of Page Content -->        
         </div>
     <!-- Scripts -->
         <!-- JavaScript: CDN, Pkg, Script -->
@@ -217,12 +233,14 @@ require 'config/cek.php';
         <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/jquery.dataTables.min.js" crossorigin="anonymous"></script>
         <script src="https://cdn.datatables.net/1.10.20/js/dataTables.bootstrap4.min.js" crossorigin="anonymous"></script>
+        <script src="assets/demo/datatables-demo.js"></script>
         <script src="https://cdn.datatables.net/buttons/2.4.1/js/dataTables.buttons.min.js"></script>
         <script src="https://cdn.datatables.net/buttons/2.4.1/js/buttons.html5.min.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
         <script src="assets/js/datatable.js"></script>
         <script src="assets/js/scanner.js"></script>
         <script src="assets/js/ui.js"></script>
+        <!-- Functions -->        
     <!-- End of Script -->
     </body>
 </html>

@@ -11,7 +11,7 @@ require 'config/cek.php';
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Petugas</title>
+        <title>Jenis</title>
         <link href="css/styles.css" rel="stylesheet" />
         <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
         <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" rel="stylesheet" >
@@ -100,88 +100,25 @@ require 'config/cek.php';
         <!-- End Navigation Bar -->
 
 
-        <!-- Page of Content -->
+<!-- page of Content -->
             <div id="layoutSidenav_content">
                 <main>
                     <div class="container-fluid">
                         <h1 class="mt-4"></h1>
-                            <ol class="breadcrumb mb-4">
-                                <li class="breadcrumb-item"><strong>Petugas</strong></li>
-                            </ol>
-                        <div class="card mb-4">
-                            <!-- Data Table -->
-                            <div class="card-body">
-                                <div class="row mb-3">
-                                    <!-- Kolom kiri: Dropdown Data Length + Search -->
-                                    <div class="col-lg-9">
-                                        <div class="row align-items-center">
-                                            <!-- Dropdown Data Length -->
-                                            <div class="col-auto mb-2">
-                                                <label class="d-flex align-items-center mb-0">
-                                                    Show
-                                                    <select id="customLength" class="custom-select custom-select-sm form-control form-control-sm mx-2">
-                                                        <option value="10">10</option>
-                                                        <option value="25">25</option>
-                                                        <option value="50">50</option>
-                                                        <option value="100">100</option>
-                                                    </select>
-                                                    entries
-                                                </label>
-                                            </div>
-                                            <!-- Search -->
-                                            <div class="col-md-4 mb-2 ml-md-3">
-                                                <input type="text" id="customSearch" class="form-control" placeholder="Cari Petugas">
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <!-- Kolom kanan: Tombol Aksi -->
-                                    <div class="col-lg-3 d-flex justify-content-lg-end flex-wrap align-items-start">
-                                        <button type="button" class="btn btn-primary mr-2 mb-2" data-toggle="modal" data-target="#myModal">
-                                            <i class="fas fa-plus"></i> Tambah
-                                        </button>
-                                    </div>
+                        <ol class="breadcrumb mb-4">
+                            <li class="breadcrumb-item"><a href="jenis.php">Jenis Barang</a></li>
+                            <li class="breadcrumb-item"><strong>Tambah</strong></li>
+                        </ol>
+                        <div class="card shadow mb-4">
+                            <div class="card-header">Tambah Jenis Barang</div>
+                                <div class="card-body">
+                                    <form method="post">
+                                        <label>Nama jenis</label>
+                                        <input type="text" id="jenis" name="jenis" class="form-control" required>
+                                        <br>
+                                        <button type="submit" class="btn btn-primary" name="tambahjenis">Submit</button>
+                                    </form>
                                 </div>
-                                <div class="table-responsive">
-                                    <table class="table table-bordered" id="dataTable" width="100%" cellspacing="0">
-                                        <thead>
-                                            <tr>
-                                                <th>No</th>
-                                                <th>Nama Petugas</th>
-                                                <th>Alamat</th>
-                                                <th>No. HP</th>
-                                                <th>Aksi</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <?php
-                                            $ambilsemuadatastock = mysqli_query($conn, "select * from petugas");
-                                            $i = 1;
-                                            while ($data=mysqli_fetch_array($ambilsemuadatastock)){
-                                                $nama = $data['namapetugas'];
-                                                $alamat = $data['alamat'];
-                                                $telp = $data['notelp'];
-                                            ?>
-
-                                            <tr>
-                                                <td><?=$i++;?></td>
-                                                <td><?=$nama;?></td>
-                                                <td><?=$alamat;?></td>
-                                                <td><?=$telp;?></td>
-                                                <td>
-                                                    <form method="post" onsubmit="return confirm('Yakin ingin menghapus petugas ini?');">
-                                                        <input type="hidden" name="idpetugas" value="<?= $data['idpetugas']; ?>">
-                                                        <button type="submit" name="hapuspetugas" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>                                                    </form>
-                                                </td>
-                                            </tr>
-                                            <?php
-
-                                            };
-
-                                            ?>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
                         </div>
                     </div>
                 </main>
@@ -195,9 +132,8 @@ require 'config/cek.php';
                     </div>
                 </footer>
             </div>
-
+        
         <!-- End of Page Content -->
-
         </div>
 
     <!-- Scripts -->
@@ -346,38 +282,6 @@ require 'config/cek.php';
     <!-- End of Script -->
 
     </body>
-
-    <!-- The Modal -->
-    <div class="modal fade" id="myModal">
-        <div class="modal-dialog">
-            <div class="modal-content">
-
-                <!-- Modal Header -->
-                <div class="modal-header">
-                    <h4 class="modal-title">Tambah Petugas</h4>
-                    <button type="button" class="close" data-dismiss="modal">&times;</button>
-                </div>
-
-                <!-- Modal body -->
-                <form method="post">
-                <div class="modal-body">
-                    <p>Nama Petugas</p>
-                    <input type="text" id="namapetugas" name="namapetugas" class="form-control" required>
-                    <br>
-                    <p>Alamat</p>
-                    <input type="text" id="alamat" name="alamat" class="form-control" required>
-                    <br>
-                    <p>No. HP</p>
-                    <input type="text" name="notelp" id="notelp" class="form-control" required>
-                    <br>
-                    <button type="submit" class="btn btn-primary" name="tambahpetugasbaru">Submit</button>
-                </div>
-            </form>
-
-            </div>
-        </div>
-    </div>
-
     
     <!-- Scanner Container -->
     <div id="scanner-container" style="display:none; justify-content:center; align-items:center; position:fixed; top:0; left:0; width:100%; height:100%; background-color:rgba(0,0,0,0.5); z-index:9999;">
