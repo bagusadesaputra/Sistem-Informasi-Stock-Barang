@@ -10252,6 +10252,6 @@ body {
   display: none !important;
 }
 
-.dataTables_paginate,
 .dataTables_info {
     display: none !important;
+} 

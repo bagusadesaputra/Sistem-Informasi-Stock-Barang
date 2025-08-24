@@ -9,7 +9,7 @@
         $barcode = $_POST['barcode'];
         $jumlah_fisik = intval($_POST['jumlah']);
         $lokasi = $_POST['lokasi'];
-        $petugas = $_POST['petugas'];
+        $petugas = $_SESSION['username'];
         $penyesuaian = isset($_POST['penyesuaian']) ? 1 : 0;
         $catatan = $_POST['catatan'] ?? '';
 
@@ -121,4 +121,4 @@
     ============================================================ */
     $data_petugas = mysqli_query($conn, "SELECT * FROM petugas");
 
-?
+?>

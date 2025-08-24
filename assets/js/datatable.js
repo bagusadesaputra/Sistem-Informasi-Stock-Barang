@@ -1,10 +1,18 @@
- (function ($) {
+(function ($) {
     "use strict";
 
     $(document).ready(function () {
         if (!$.fn.DataTable.isDataTable('#dataTable')) {
             var table = $('#dataTable').DataTable({
-                lengthChange: false
+                lengthChange: false,
+                pageLength: 10, // default awal 10 baris
+                language: {
+                    paginate: {
+                        previous: "Prev",
+                        next: "Next"
+                    },
+                    info: "Menampilkan _START_ sampai _END_ dari _TOTAL_ data"
+                }
             });
 
             /* ===== Custom dropdown length ===== */
@@ -17,7 +25,7 @@
                 table.search(this.value).draw();
             });
 
-            /* ===== Filter tanggal ===== */
+            /* ===== Filter tanggal (opsional) ===== */
             $.fn.dataTable.ext.search.push(function (settings, data, dataIndex) {
                 var min = $('#minDate').val();
                 var max = $('#maxDate').val();
@@ -40,6 +48,7 @@
             console.warn("DataTable sudah diinisialisasi, tidak membuat ulang.");
         }
     });
+
 
     /* =========================================
     FUNGSI: Inisialisasi DataTable dengan tombol ekspor CSV
@@ -70,4 +79,4 @@
     });
 
 
-})(jQuery);
+})(jQuery);

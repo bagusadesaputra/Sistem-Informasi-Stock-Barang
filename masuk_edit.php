@@ -1,7 +1,17 @@
- <?php
+<?php
 require 'config/koneksi.php';
 require 'functions/masuk_functions.php';
 require 'config/cek.php';
+
+if (!isset($_SESSION['log'])) {
+    header('Location: login.php');
+    exit;
+}
+
+if ($_SESSION['role'] != 'superadmin') {
+    echo "<script>alert('Anda tidak punya akses ke halaman ini!'); window.location='index.php';</script>";
+    exit;
+}
 
 if (isset($_GET['id'])) {
     $id = $_GET['id'];
@@ -20,7 +30,7 @@ if (isset($_GET['id'])) {
         $satuan = $data['satuan'];
         $qty = $data['qty'];
         $tgl = $data['tgl'];
-        $petugas = $data['petugas'];
+        $petugas = $_SESSION['username'];
     } else {
         echo "<script>alert('Data tidak ditemukan'); window.location='masuk.php';</script>";
         exit;
@@ -76,53 +86,74 @@ if (isset($_GET['id'])) {
                     <div class="sb-sidenav-menu">
                     <!-- List -->
                         <div class="nav">
+                            <?php if ($_SESSION['role'] == 'superadmin'): ?>
+                                <div class="sb-sidenav-menu-heading">Master</div>
+                                <a class="nav-link" href="index.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-dolly-flatbed"></i></div>
+                                    Barang
+                                </a>
+                                <a class="nav-link" href="jenis.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-th-large"></i></div>
+                                    Jenis Barang
+                                </a>
+                                <a class="nav-link" href="lokasi.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                    Lokasi Barang
+                                </a>
+                                <a class="nav-link" href="satuan.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-sort-numeric-up"></i></div>
+                                    Satuan Barang
+                                </a>
+                                <a class="nav-link" href="petugas.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                                    Petugas
+                                </a>
+
+                                <div class="sb-sidenav-menu-heading">Transaksi Barang</div>
+                                <a class="nav-link" href="opname.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-cubes"></i></div>
+                                    Opname
+                                </a>
+                                <a class="nav-link" href="masuk.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-sign-in-alt"></i></div>
+                                    Barang Masuk
+                                </a>
+                                <a class="nav-link" href="keluar.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-sign-out-alt"></i></div>
+                                    Barang Keluar
+                                </a>
+                                <a class="nav-link" href="reject.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-times-circle"></i></div>
+                                    Barang Reject
+                                </a>
+
+                            <?php elseif ($_SESSION['role'] == 'admin_so'): ?>
+                                <div class="sb-sidenav-menu-heading">Menu</div>
+                                <a class="nav-link" href="index.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
+                                    Barang
+                                </a>
+                                <a class="nav-link" href="opname.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-cubes"></i></div>
+                                    Opname
+                                </a>
                             
-                            <div class="sb-sidenav-menu-heading">Master</div>
-                            <a class="nav-link" href="index.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-dolly-flatbed"></i></div>
-                                Barang
-                            </a>
-                            <a class="nav-link" href="jenis.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-th-large"></i></div>
-                                Jenis Barang
-                            </a>
-                            <a class="nav-link" href="lokasi.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-map-marker-alt"></i></div>
-                                Lokasi Barang
-                            </a>
-                            <a class="nav-link" href="satuan.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-sort-numeric-up"></i></div>
-                                Satuan Barang
-                            </a>
-                            <a class="nav-link" href="petugas.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                                Petugas
-                            </a>
-                            
-                            <div class="sb-sidenav-menu-heading">Transaksi Barang</div>
-                            <a class="nav-link" href="opname.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-cubes"></i></div>
-                                Opname
-                            </a>
-                            <a class="nav-link" href="masuk.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-sign-in-alt"></i></div>
-                                Barang Masuk
-                            </a>
-                            <a class="nav-link" href="keluar.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-sign-out-alt"></i></div>
-                                Barang Keluar
-                            </a>
-                            <a class="nav-link" href="reject.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-times-circle"></i></div>
-                                Barang Reject
-                            </a>
+                            <?php elseif ($_SESSION['role'] == 'admin_gudang'): ?>
+                                <!-- Menu Admin Gudang -->
+                                <div class="sb-sidenav-menu-heading">Menu</div>
+                                <a class="nav-link" href="keluar.php">
+                                    <div class="sb-nav-link-icon">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    </div>Barang Keluar
+                                </a>
+                            <?php endif; ?>
                         </div>
                     </div>
 
                     <!--footer-->
                     <div class="sb-sidenav-footer">
                         <div class="small">Logged in as:</div>
-                        Admin
+                        <?php echo htmlspecialchars($_SESSION['username']); ?>
                     </div>
                 </nav>
             </div>
@@ -159,16 +190,6 @@ if (isset($_GET['id'])) {
                                     <br>
                                     <label>Keterangan</label>
                                     <input type="text" id="" name="keterangan" class="form-control" value="<?= $data['keterangan']; ?>">
-                                    <br>
-                                    <label>Petugas</label>
-                                    <select name="petugas" class="form-control" required>
-                                        <option value="">-- Pilih Petugas --</option>
-                                        <?php while ($p = mysqli_fetch_array($data_petugas)) {
-                                            $selected = ($p['namapetugas'] == $data['petugas']) ? 'selected' : '';
-                                        ?>
-                                            <option value="<?= $p['namapetugas'] ?>" <?= $selected ?>><?= $p['namapetugas'] ?></option>
-                                        <?php } ?>
-                                    </select>
                                     <br>
                                     <button type="submit" class="btn btn-warning" name="editmasuk">Update</button>
                                 </form>
@@ -214,4 +235,4 @@ if (isset($_GET['id'])) {
         <button type="button" class="btn btn-danger mt-3" onclick="stopScanner()">Tutup</button>
     </div>
 
-</html>
+</html>

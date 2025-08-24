@@ -1,7 +1,19 @@
- <?php
+<?php
 require 'config/koneksi.php';
 require 'functions/function.php';
 require 'config/cek.php';
+
+if (!isset($_SESSION['log'])) {
+    header('Location: login.php');
+    exit;
+}
+
+// Validasi role
+if ($_SESSION['role'] != 'superadmin') {
+    echo "<script>alert('Anda tidak punya akses ke halaman ini!'); window.location='index.php';</script>";
+    exit;
+}
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -47,53 +59,73 @@ require 'config/cek.php';
                     <div class="sb-sidenav-menu">
                     <!-- List -->
                         <div class="nav">
+                            <?php if ($_SESSION['role'] == 'superadmin'): ?>
+                                <div class="sb-sidenav-menu-heading">Master</div>
+                                <a class="nav-link" href="index.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-dolly-flatbed"></i></div>
+                                    Barang
+                                </a>
+                                <a class="nav-link" href="jenis.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-th-large"></i></div>
+                                    Jenis Barang
+                                </a>
+                                <a class="nav-link" href="lokasi.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-map-marker-alt"></i></div>
+                                    Lokasi Barang
+                                </a>
+                                <a class="nav-link" href="satuan.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-sort-numeric-up"></i></div>
+                                    Satuan Barang
+                                </a>
+                                <a class="nav-link" href="petugas.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
+                                    Petugas
+                                </a>
+
+                                <div class="sb-sidenav-menu-heading">Transaksi Barang</div>
+                                <a class="nav-link" href="opname.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-cubes"></i></div>
+                                    Opname
+                                </a>
+                                <a class="nav-link" href="masuk.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-sign-in-alt"></i></div>
+                                    Barang Masuk
+                                </a>
+                                <a class="nav-link" href="keluar.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-sign-out-alt"></i></div>
+                                    Barang Keluar
+                                </a>
+                                <a class="nav-link" href="reject.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-times-circle"></i></div>
+                                    Barang Reject
+                                </a>
+
+                            <?php elseif ($_SESSION['role'] == 'admin_so'): ?>
+                                <div class="sb-sidenav-menu-heading">Menu</div>
+                                <a class="nav-link" href="index.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-home"></i></div>
+                                    Barang
+                                </a>
+                                <a class="nav-link" href="opname.php">
+                                    <div class="sb-nav-link-icon"><i class="fas fa-cubes"></i></div>
+                                    Opname
+                                </a>
                             
-                            <div class="sb-sidenav-menu-heading">Master</div>
-                            <a class="nav-link" href="index.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-dolly-flatbed"></i></div>
-                                Barang
-                            </a>
-                            <a class="nav-link" href="jenis.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-th-large"></i></div>
-                                Jenis Barang
-                            </a>
-                            <a class="nav-link" href="lokasi.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-map-marker-alt"></i></div>
-                                Lokasi Barang
-                            </a>
-                            <a class="nav-link" href="satuan.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-sort-numeric-up"></i></div>
-                                Satuan Barang
-                            </a>
-                            <a class="nav-link" href="petugas.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-user"></i></div>
-                                Petugas
-                            </a>
-                            
-                            <div class="sb-sidenav-menu-heading">Transaksi Barang</div>
-                            <a class="nav-link" href="opname.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-cubes"></i></div>
-                                Opname
-                            </a>
-                            <a class="nav-link" href="masuk.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-sign-in-alt"></i></div>
-                                Barang Masuk
-                            </a>
-                            <a class="nav-link" href="keluar.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-sign-out-alt"></i></div>
-                                Barang Keluar
-                            </a>
-                            <a class="nav-link" href="reject.php">
-                                <div class="sb-nav-link-icon"><i class="fas fa-times-circle"></i></div>
-                                Barang Reject
-                            </a>
+                            <?php elseif ($_SESSION['role'] == 'admin_gudang'): ?>
+                                <!-- Menu Admin Gudang -->
+                                <div class="sb-sidenav-menu-heading">Menu</div>
+                                <a class="nav-link" href="keluar.php">
+                                    <div class="sb-nav-link-icon">
+                                        <i class="fas fa-sign-out-alt"></i>
+                                    </div>Barang Keluar
+                                </a>
+                            <?php endif; ?>
                         </div>
                     </div>
-
                     <!--footer-->
                     <div class="sb-sidenav-footer">
                         <div class="small">Logged in as:</div>
-                        Admin
+                        <?php echo htmlspecialchars($_SESSION['username']); ?>
                     </div>
                 </nav>
             </div>
@@ -136,9 +168,9 @@ require 'config/cek.php';
                                     </div>
                                     <!-- Kolom kanan: Tombol Aksi -->
                                     <div class="col-lg-3 d-flex justify-content-lg-end flex-wrap align-items-start">
-                                        <button type="button" class="btn btn-primary mr-2 mb-2" data-toggle="modal" data-target="#myModal">
-                                            <i class="fas fa-plus"></i> Tambah
-                                        </button>
+                                            <a href="petugas_tambah.php" class="btn btn-primary mr-2 mb-2">
+                                                <i class="fas fa-plus"></i> Tambah
+                                            </a>
                                     </div>
                                 </div>
                                 <div class="table-responsive">
@@ -147,37 +179,38 @@ require 'config/cek.php';
                                             <tr>
                                                 <th>No</th>
                                                 <th>Nama Petugas</th>
-                                                <th>Alamat</th>
-                                                <th>No. HP</th>
+                                                <th>Password</th>
+                                                <th>Role</th>
                                                 <th>Aksi</th>
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <?php
-                                            $ambilsemuadatastock = mysqli_query($conn, "select * from petugas");
+                                            // Ambil semua user
+                                            $ambilsemuadatauser = mysqli_query($conn, "SELECT * FROM login");
                                             $i = 1;
-                                            while ($data=mysqli_fetch_array($ambilsemuadatastock)){
-                                                $nama = $data['namapetugas'];
-                                                $alamat = $data['alamat'];
-                                                $telp = $data['notelp'];
+                                            while ($data = mysqli_fetch_array($ambilsemuadatauser)) {
+                                                $id = $data['id'];
+                                                $username = $data['username'];
+                                                $password = $data['password']; // password hash
+                                                $role = $data['role'];
                                             ?>
-
                                             <tr>
-                                                <td><?=$i++;?></td>
-                                                <td><?=$nama;?></td>
-                                                <td><?=$alamat;?></td>
-                                                <td><?=$telp;?></td>
+                                                <td><?= $i++; ?></td>
+                                                <td><?= htmlspecialchars($username); ?></td>
+                                                <td><?= htmlspecialchars($password); ?></td>
+                                                <td><?= htmlspecialchars($role); ?></td>
                                                 <td>
-                                                    <form method="post" onsubmit="return confirm('Yakin ingin menghapus petugas ini?');">
-                                                        <input type="hidden" name="idpetugas" value="<?= $data['idpetugas']; ?>">
-                                                        <button type="submit" name="hapuspetugas" class="btn btn-danger btn-sm"><i class="fas fa-trash-alt"></i></button>                                                    </form>
+                                                    <!-- Tombol hapus -->
+                                                    <form method="post" onsubmit="return confirm('Yakin ingin menghapus akun ini?');" style="display:inline-block;">
+                                                        <input type="hidden" name="id" value="<?= $id; ?>">
+                                                        <button type="submit" name="hapusakun" class="btn btn-danger btn-sm">
+                                                            <i class="fas fa-trash-alt"></i>
+                                                        </button>
+                                                    </form>
                                                 </td>
                                             </tr>
-                                            <?php
-
-                                            };
-
-                                            ?>
+                                            <?php } ?>
                                         </tbody>
                                     </table>
                                 </div>

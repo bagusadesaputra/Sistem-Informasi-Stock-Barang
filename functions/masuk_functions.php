@@ -2,61 +2,76 @@
     session_start();
 
     if (isset($_POST['tambahbarangmasuk'])) {
-        $barcode = $_POST['barcode'];
-        $qty = intval($_POST['qty']);
-        $petugas = $_POST['petugas'];
-        $keterangan = $_POST['keterangan'];
+    $barcode = $_POST['barcode'];
+    $qty = intval($_POST['qty']);
+    $keterangan = $_POST['keterangan'];
+    $petugas = $_SESSION['username'];
 
-        // Data reject
-        $qty_reject = isset($_POST['qty_reject']) ? intval($_POST['qty_reject']) : 0;
-        $keterangan_reject = isset($_POST['keterangan_reject']) ? $_POST['keterangan_reject'] : '';
+    // Data reject
+    $qty_reject = isset($_POST['qty_reject']) ? intval($_POST['qty_reject']) : 0;
+    $keterangan_reject = isset($_POST['keterangan_reject']) ? $_POST['keterangan_reject'] : '';
 
-        $tgl_sekarang = date('Y-m-d');
+    $tgl_sekarang = date('Y-m-d');
 
-        // Ambil data barang dari stock
-        $cek = mysqli_query($conn, "SELECT * FROM stock WHERE barcode='$barcode'");
-        $data = mysqli_fetch_assoc($cek);
+    // === Ambil PO terakhir untuk generate PO baru ===
+    $queryLastPO = mysqli_query($conn, "SELECT po FROM masuk ORDER BY id DESC LIMIT 1");
+    $dataLastPO = mysqli_fetch_assoc($queryLastPO);
 
-        if ($data) {
-            $namabarang = $data['namabarang'];
-            $satuan = $data['satuan'];
+    if ($dataLastPO && !empty($dataLastPO['po'])) {
+        $lastNumber = (int)substr($dataLastPO['po'], 2); // Ambil angka setelah RP
+        $nextNumber = $lastNumber + 1;
+    } else {
+        $nextNumber = 1; // Jika belum ada data
+    }
 
-            // Simpan barang masuk
-            $insertMasuk = mysqli_query($conn, "INSERT INTO masuk (tgl, barcode, namabarang, satuan, qty, keterangan, petugas) VALUES (
-                '$tgl_sekarang',
-                '$barcode',
-                '$namabarang',
-                '$satuan',
-                '$qty',
-                '$keterangan',
-                '$petugas'
-            )");
+    $poBaru = 'RP' . str_pad($nextNumber, 3, '0', STR_PAD_LEFT);
 
-            if ($insertMasuk) {
-                // Update stok
-                mysqli_query($conn, "UPDATE stock SET qty = qty + $qty WHERE barcode='$barcode'");
+    // === Ambil data barang dari stock ===
+    $cek = mysqli_query($conn, "SELECT * FROM stock WHERE barcode='$barcode'");
+    $data = mysqli_fetch_assoc($cek);
 
-                // Jika ada reject
-                if ($qty_reject > 0) {
-                    mysqli_query($conn, "INSERT INTO reject_barang (tanggal, barcode, namabarang, satuan, jumlah, petugas, keterangan) VALUES (
-                        '$tgl_sekarang',
-                        '$barcode',
-                        '$namabarang',
-                        '$satuan',
-                        '$qty_reject',
-                        '$petugas',
-                        '$keterangan_reject'
-                    )");
-                }
+    if ($data) {
+        $namabarang = $data['namabarang'];
+        $satuan = $data['satuan'];
 
-                echo "<script>alert('Barang masuk berhasil ditambahkan'); window.location.href='masuk.php';</script>";
-            } else {
-                echo "<script>alert('Gagal menambahkan barang masuk');</script>";
+        // Simpan barang masuk dengan PO
+        $insertMasuk = mysqli_query($conn, "INSERT INTO masuk (tgl, po, barcode, namabarang, satuan, qty, keterangan, petugas) VALUES (
+            '$tgl_sekarang',
+            '$poBaru',
+            '$barcode',
+            '$namabarang',
+            '$satuan',
+            '$qty',
+            '$keterangan',
+            '$petugas'
+        )");
+
+        if ($insertMasuk) {
+            // Update stok
+            mysqli_query($conn, "UPDATE stock SET qty = qty + $qty WHERE barcode='$barcode'");
+
+            // Jika ada reject
+            if ($qty_reject > 0) {
+                mysqli_query($conn, "INSERT INTO reject_barang (tanggal, barcode, namabarang, satuan, jumlah, petugas, keterangan) VALUES (
+                    '$tgl_sekarang',
+                    '$barcode',
+                    '$namabarang',
+                    '$satuan',
+                    '$qty_reject',
+                    '$petugas',
+                    '$keterangan_reject'
+                )");
             }
+
+            echo "<script>alert('Barang masuk berhasil ditambahkan dengan PO $poBaru'); window.location.href='masuk.php';</script>";
         } else {
-            echo "<script>alert('Barcode tidak ditemukan di stock');</script>";
+            echo "<script>alert('Gagal menambahkan barang masuk');</script>";
         }
+    } else {
+        echo "<script>alert('Barcode tidak ditemukan di stock');</script>";
+    }
 }
+
 
 
     // Hapus data barang masuk + kembalikan stock
@@ -100,7 +115,7 @@
     if (isset($_POST['editmasuk'])) {
         $id         = $_POST['id'];
         $qtyBaru    = $_POST['qty'];
-        $petugas    = $_POST['petugas'];
+        $petugas = $_SESSION['username'];
         $keterangan = $_POST['keterangan'];
 
         // Ambil data lama dari database
@@ -160,4 +175,4 @@
     $data_petugas = mysqli_query($conn, "SELECT * FROM petugas");
 
 
-?
+?>

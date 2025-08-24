@@ -14,6 +14,34 @@ if ($_SESSION['role'] != 'superadmin') {
     exit;
 }
 
+// Ambil role dari ENUM di database
+$roles = [];
+$result = $conn->query("SHOW COLUMNS FROM login LIKE 'role'");
+if ($result) {
+    $row = $result->fetch_assoc();
+    preg_match("/^enum\('(.*)'\)$/", $row['Type'], $matches);
+    $roles = explode("','", $matches[1]);
+}
+
+// Proses simpan user baru
+if (isset($_POST['simpan'])) {
+    $username = trim($_POST['username']);
+    $password = $_POST['password']; // langsung simpan plain text
+    $role = $_POST['role'];
+
+    if (!empty($username) && !empty($password) && !empty($role)) {
+        $stmt = $conn->prepare("INSERT INTO login (username, password, role) VALUES (?, ?, ?)");
+        $stmt->bind_param("sss", $username, $password, $role); // password tanpa hash
+
+        if ($stmt->execute()) {
+            echo "<script>alert('Akun berhasil dibuat!'); window.location='petugas.php';</script>";
+        } else {
+            echo "<script>alert('Gagal membuat akun!');</script>";
+        }
+    } else {
+        echo "<script>alert('Semua field harus diisi!');</script>";
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -23,7 +51,7 @@ if ($_SESSION['role'] != 'superadmin') {
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
         <meta name="description" content="" />
         <meta name="author" content="" />
-        <title>Jenis</title>
+        <title>Satuan</title>
         <link href="css/styles.css" rel="stylesheet" />
         <link href="https://cdn.datatables.net/1.10.20/css/dataTables.bootstrap4.min.css" rel="stylesheet" crossorigin="anonymous" />
         <link href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.dataTables.min.css" rel="stylesheet" >
@@ -122,7 +150,6 @@ if ($_SESSION['role'] != 'superadmin') {
                             <?php endif; ?>
                         </div>
                     </div>
-
                     <!--footer-->
                     <div class="sb-sidenav-footer">
                         <div class="small">Logged in as:</div>
@@ -139,17 +166,32 @@ if ($_SESSION['role'] != 'superadmin') {
                     <div class="container-fluid">
                         <h1 class="mt-4"></h1>
                         <ol class="breadcrumb mb-4">
-                            <li class="breadcrumb-item"><a href="jenis.php">Jenis Barang</a></li>
+                            <li class="breadcrumb-item"><a href="petugas.php">Petugas</a></li>
                             <li class="breadcrumb-item"><strong>Tambah</strong></li>
                         </ol>
                         <div class="card shadow mb-4">
-                            <div class="card-header">Tambah Jenis Barang</div>
+                            <div class="card-header">Tambah Petugas</div>
                                 <div class="card-body">
-                                    <form method="post">
-                                        <label>Nama jenis</label>
-                                        <input type="text" id="jenis" name="jenis" class="form-control" required>
-                                        <br>
-                                        <button type="submit" class="btn btn-primary" name="tambahjenis">Submit</button>
+                                    <form method="POST">
+                                        <div class="form-group">
+                                            <label>Username</label>
+                                            <input type="text" name="username" class="form-control" placeholder="Masukkan Username" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Password</label>
+                                            <input type="password" name="password" class="form-control" placeholder="Masukkan Password" required>
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Role</label>
+                                            <select name="role" class="form-control" required>
+                                                <option value="">Pilih Role</option>
+                                                <?php foreach ($roles as $role): ?>
+                                                    <option value="<?= htmlspecialchars($role) ?>"><?= ucfirst($role) ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </div>
+                                        <button type="submit" name="simpan" class="btn btn-primary">Simpan</button>
+                                        <a href="petugas.php" class="btn btn-secondary">Kembali</a>
                                     </form>
                                 </div>
                         </div>

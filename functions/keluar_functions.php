@@ -5,7 +5,7 @@
     if (isset($_POST['tambahbarangkeluar'])) {
         $barcode = $_POST['barcode'];
         $qty = intval($_POST['qty']);
-        $petugas = $_POST['petugas'];
+        $petugas = $_SESSION['username'];
         $keterangan = $_POST['keterangan'];
 
         // Ambil detail barang dari tabel stock
@@ -83,7 +83,7 @@
     if (isset($_POST['editkeluar'])) {
         $id = $_POST['id'];
         $qtyBaru = intval($_POST['qty']);
-        $petugas = $_POST['petugas'];
+        $petugas = $_SESSION['username'];
         $keterangan = $_POST['keterangan']; // ambil keterangan dari form
 
         // Ambil data lama dari database
@@ -140,4 +140,4 @@
     ============================================================ */
     $data_petugas = mysqli_query($conn, "SELECT * FROM petugas");
 
-?
+?>

@@ -89,18 +89,20 @@
         }
     }
 
-    // Hapus Petugas
-    if(isset($_POST['hapuspetugas'])){
-        $idpetugas = $_POST['idpetugas']; // pastikan idpetugas dikirim melalui form
+if (isset($_POST['hapusakun'])) {
+    $id = intval($_POST['id']);
 
-        $hapus = mysqli_query($conn, "DELETE FROM petugas WHERE idpetugas='$idpetugas'");
-        if($hapus){
-            header('location:petugas.php');
+    if ($id > 0) {
+        $stmt = $conn->prepare("DELETE FROM login WHERE id = ?");
+        $stmt->bind_param("i", $id);
+
+        if ($stmt->execute()) {
+            echo "<script>alert('Akun berhasil dihapus!'); window.location='petugas.php';</script>";
         } else {
-            // echo 'Hapus Gagal';
-            header('location:petugas.php');
+            echo "<script>alert('Gagal menghapus akun!');</script>";
         }
     }
+}
 
     // option data jenis
     $data_jenis = mysqli_query($conn, "SELECT * FROM jenis");
@@ -114,4 +116,4 @@
     // option data petugas
     $data_petugas = mysqli_query($conn, "SELECT * FROM petugas");
 
-?
+?>

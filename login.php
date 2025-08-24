@@ -1,27 +1,43 @@
- <?php
+<?php
 require 'config/koneksi.php';
 require 'functions/function.php';
 
-//cek login terdaftar atau tidak
-if(isset($_POST['login'])){
-    $email = $_POST['email'];
+
+if (isset($_POST['login'])) {
+    $username = $_POST['username'];
     $password = $_POST['password'];
-    //mencocokkan data dengan database
-    $cekdatabase = mysqli_query($conn, "SELECT * FROM login where email = '$email' and password = '$password'");
-    //hitung jumlah data
-    $hitung = mysqli_num_rows($cekdatabase);
-    if ($hitung>0){
-        $_SESSION['log'] = 'True';
-        header('location:index.php');
+
+    $stmt = $conn->prepare("SELECT id, username, password, role FROM login WHERE username = ?");
+    $stmt->bind_param("s", $username);
+    $stmt->execute();
+    $result = $stmt->get_result();
+
+    if ($result->num_rows > 0) {
+        $data = $result->fetch_assoc();
+
+        if ($password === $data['password']) { // Tanpa hash
+            $_SESSION['log'] = true;
+            $_SESSION['username'] = $data['username'];
+            $_SESSION['role'] = $data['role'];
+
+            if ($data['role'] == 'superadmin') {
+                header('Location: index.php');
+            } elseif ($data['role'] == 'admin_so') {
+                header('Location: index.php');
+            } elseif ($data['role'] == 'admin_gudang') {
+                header('Location: keluar.php');
+            } elseif ($data['role'] == 'sales') {
+                header('Location: index.php');
+            } else {
+                header('Location: index.php'); // default
+            }
+            exit;
+        } else {
+            echo "<script>alert('Password salah!'); window.location='login.php';</script>";
+        }
     } else {
-        header('location:login.php');
+        echo "<script>alert('Username tidak ditemukan!'); window.location='login.php';</script>";
     }
-}
-
-if(!isset($_SESSION['log'])){
-
-} else {
-    header('location:index.php');
 }
 
 ?>
@@ -47,17 +63,40 @@ if(!isset($_SESSION['log'])){
                                 <div class="card shadow-lg border-0 rounded-lg mt-5">
                                     <div class="card-header"><h3 class="text-center font-weight-light my-4">Login</h3></div>
                                     <div class="card-body">
-                                        <form method="post">
+                                        <form method="post" action="login.php" autocomplete="off">
+                                            <!-- Username -->
                                             <div class="form-group">
-                                                <label class="small mb-1" for="inputEmailAddress">Email</label>
-                                                <input class="form-control py-4" name="email" id="inputEmailAddress" type="email" placeholder="Enter email address" />
+                                                <label class="small mb-1" for="inputUsername">Username</label>
+                                                <input 
+                                                    class="form-control py-4" 
+                                                    name="username" 
+                                                    id="inputUsername" 
+                                                    type="text" 
+                                                    placeholder="Enter username" 
+                                                    required 
+                                                    autofocus
+                                                />
                                             </div>
+
+                                            <!-- Password -->
                                             <div class="form-group">
                                                 <label class="small mb-1" for="inputPassword">Password</label>
-                                                <input class="form-control py-4" name="password" id="inputPassword" type="password" placeholder="Enter password" />
+                                                <input 
+                                                    class="form-control py-4" 
+                                                    name="password" 
+                                                    id="inputPassword" 
+                                                    type="password" 
+                                                    placeholder="Enter password" 
+                                                    required
+                                                />
                                             </div>
+
+                                            <!-- CSRF Token (optional) -->
+                                            <input type="hidden" name="csrf_token" value="<?php echo md5(uniqid()); ?>">
+
+                                            <!-- Submit -->
                                             <div class="form-group d-flex align-items-center justify-content-between mt-4 mb-0">
-                                                <button class="btn btn-primary" name="login" >Login</button>
+                                                <button class="btn btn-primary" name="login" type="submit">Login</button>
                                             </div>
                                         </form>
                                     </div>

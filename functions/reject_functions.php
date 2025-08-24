@@ -5,7 +5,7 @@
     if (isset($_POST['tambahbarangreject'])) {
         $barcode = $_POST['barcode'];
         $jumlah = intval($_POST['jumlah']);
-        $petugas = $_POST['petugas'];
+        $petugas = $_SESSION['username'];
         $keterangan = mysqli_real_escape_string($conn, $_POST['keterangan']); // hindari SQL injection
 
         // Ambil detail barang dari tabel stock
@@ -85,7 +85,7 @@
     if (isset($_POST['editreject'])) {
         $id = $_POST['id'];
         $jumlahBaru = $_POST['jumlah']; // karena kolomnya 'jumlah' bukan 'qty'
-        $petugas = $_POST['petugas'];
+        $petugas = $_SESSION['username'];
         $keterangan = $_POST['keterangan'];
 
         // Ambil data lama dari database
@@ -141,4 +141,4 @@
     Deskripsi: Mengambil semua data petugas
     ============================================================ */
     $data_petugas = mysqli_query($conn, "SELECT * FROM petugas");
-?
+?>
